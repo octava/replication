@@ -271,7 +271,7 @@ abstract class AbstractSync
     }
 
     /**
-     * Получить изменившиеся значения полнй
+     * Получить изменившиеся значения полей
      * @param array $checkColumns
      * @param array $localData
      * @param array $remoteData
