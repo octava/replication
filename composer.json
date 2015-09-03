@@ -9,7 +9,7 @@
             "email": "TheRatW@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {"Octava\\Component\\Replication\\": ""}
     },
