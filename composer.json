@@ -1,0 +1,22 @@
+{
+    "name": "octava/replication",
+    "description": "Replication component for mysql",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vladimir Pak",
+            "email": "TheRatW@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {"Octava\\Component\\Replication": ""}
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    },
+    "require": {}
+}
