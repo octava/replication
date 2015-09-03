@@ -299,7 +299,15 @@ class BatchSaver
         }
 
         $connection = $this->getEntityManager()->getConnection();
-        return is_null($value) ? 'NULL' : $connection->quote($value, $type);
+
+        if (is_null($value)) {
+            $result = 'NULL';
+        } elseif (is_bool($value)) {
+            $result = $value ? 1 : 0;
+        } else {
+            $result = $connection->quote($value, $type);
+        }
+        return $result;
     }
 
     protected function getTableName(AbstractBatchContainer $batchContainer)
