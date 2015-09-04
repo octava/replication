@@ -282,14 +282,17 @@ abstract class AbstractSync
     {
         $result = [];
         foreach ($checkColumns as $name => $type) {
-            if (!array_key_exists($name, $localData)) {
-                throw new \InvalidArgumentException(
-                    sprintf('Check column %s does not exists in $localData', $name)
-                );
-            }
+            if (array_key_exists($name, $remoteData)) {
+                if ((string)$remoteData[$name] !== '' && !array_key_exists($name, $localData)) {
+                    $msg = sprintf('Check column %s does not exists in $localData', $name);
 
-            if (array_key_exists($name, $remoteData) && $localData[$name] != $remoteData[$name]) {
-                $result[$name] = $remoteData[$name];
+                    $this->getLogger()->error($msg, ['remote' => $remoteData, 'local' => $localData]);
+                    throw new \InvalidArgumentException($msg);
+                }
+
+                if ($localData[$name] != $remoteData[$name]) {
+                    $result[$name] = $remoteData[$name];
+                }
             }
         }
 
