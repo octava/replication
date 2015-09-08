@@ -290,7 +290,18 @@ abstract class AbstractSync
                     throw new \InvalidArgumentException($msg);
                 }
 
-                if ($localData[$name] != $remoteData[$name]) {
+                $local = $localData[$name];
+                $remote = $remoteData[$name];
+
+                if ($local instanceof \DateTime) {
+                    $local = $local->format('Y-m-d H:i:s');
+                }
+
+                if ($remote instanceof \DateTime) {
+                    $remote = $remote->format('Y-m-d H:i:s');
+                }
+
+                if ($local != $remote) {
                     $result[$name] = $remoteData[$name];
                 }
             }
