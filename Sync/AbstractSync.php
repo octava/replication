@@ -1,6 +1,7 @@
 <?php
 namespace Octava\Component\Replication\Sync;
 
+use Monolog\Handler\NullHandler;
 use Octava\Component\Replication\Batch\BatchReport;
 use Octava\Component\Replication\Batch\BatchSaver;
 use Symfony\Bridge\Monolog\Logger;
@@ -139,6 +140,10 @@ abstract class AbstractSync
      */
     public function getLogger()
     {
+        if (null === $this->logger) {
+            $this->logger = new Logger(__CLASS__);
+            $this->logger->pushHandler(new NullHandler());
+        }
         return $this->logger;
     }
 
