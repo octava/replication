@@ -192,6 +192,24 @@ abstract class AbstractSync
         return $this;
     }
 
+    public function isDifferent($local, $remote)
+    {
+        $flag = false;
+        if ($local instanceof \DateTime) {
+            $local = $local->format('Y-m-d H:i:s');
+        }
+        if ($remote instanceof \DateTime) {
+            $remote = $remote->format('Y-m-d H:i:s');
+        }
+
+        if (is_numeric($local) && is_numeric($remote)) {
+            $flag = 0 !== bccomp($local, $remote, 50);
+        } elseif ($local != $remote) {
+            $flag = true;
+        }
+        return $flag;
+    }
+
     protected function walk(callable $callback, $limit = 500)
     {
         $this->getLogger()->info(sprintf('Initialized %d data provider(s)', count($this->getDataProviders())));
@@ -240,31 +258,27 @@ abstract class AbstractSync
      * @param array $checkColumns
      * @param array $localData
      * @param array $remoteData
+     * @param array $changes
      * @return bool
-     * @throws \InvalidArgumentException
      */
-    protected function existsChanges(array $checkColumns, array $localData, array $remoteData)
+    protected function existsChanges(array $checkColumns, array $localData, array $remoteData, array &$changes = null)
     {
+        $data = $this->getUpdateValues($checkColumns, $localData, $remoteData, $changes);
+
         $result = false;
-        foreach ($checkColumns as $name => $type) {
-            if (!array_key_exists($name, $localData)) {
-                throw new \InvalidArgumentException(
-                    sprintf('Check column %s does not exists in $localData', $name)
-                );
-            }
-            if (array_key_exists($name, $remoteData) && $localData[$name] != $remoteData[$name]) {
+        if (!empty($data)) {
+            $result = true;
+
+            foreach ($changes as $name => $change) {
                 $this->getLogger()->debug(
                     'Detect change',
                     [
                         'name' => $name,
-                        'val1' => $localData[$name],
-                        'val2' => $remoteData[$name],
+                        'val1' => $change['local'],
+                        'val2' => $change['remote'],
                         'remote' => $remoteData,
                     ]
                 );
-
-                $result = true;
-                break;
             }
         }
         return $result;
@@ -275,67 +289,29 @@ abstract class AbstractSync
      * @param array $checkColumns
      * @param array $localData
      * @param array $remoteData
+     * @param array $report
      * @return array
-     * @throws \InvalidArgumentException
      */
-    protected function getUpdateValues(array $checkColumns, array $localData, array $remoteData)
+    protected function getUpdateValues(array $checkColumns, array $localData, array $remoteData, array &$report = null)
     {
         $result = [];
         foreach ($checkColumns as $name => $type) {
+            if (!array_key_exists($name, $localData)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Check column %s does not exists in $localData', $name)
+                );
+            }
             if (array_key_exists($name, $remoteData)) {
-                if ((string)$remoteData[$name] !== '' && !array_key_exists($name, $localData)) {
-                    $msg = sprintf('Check column %s does not exists in $localData', $name);
-
-                    $this->getLogger()->error($msg, ['remote' => $remoteData, 'local' => $localData]);
-                    throw new \InvalidArgumentException($msg);
-                }
-
                 $local = $localData[$name];
                 $remote = $remoteData[$name];
+                $isDifferent = $this->isDifferent($local, $remote);
 
-                if ($local instanceof \DateTime) {
-                    $local = $local->format('Y-m-d H:i:s');
-                }
-
-                if ($remote instanceof \DateTime) {
-                    $remote = $remote->format('Y-m-d H:i:s');
-                }
-
-                if ($local != $remote) {
-                    $result[$name] = $remoteData[$name];
+                if ($isDifferent) {
+                    $result[$name] = $remote;
+                    $report[$name] = ['local' => $local, 'remote' => $remote];
                 }
             }
         }
-
         return $result;
-    }
-
-    /**
-     * Получить отчёт по сравнению данных из удалённого источника с локальными
-     * @param array $checkColumns
-     * @param array $localData
-     * @param array $remoteData
-     * @return array
-     */
-    protected function getUpdateReport(array $checkColumns, array $localData, array $remoteData)
-    {
-        $updateValues = $this->getUpdateValues($checkColumns, $localData, $remoteData);
-
-        $changes = [];
-        foreach ($updateValues as $name => $remoteValue) {
-            $localValue = $localData[$name];
-
-            if ($localValue instanceof \DateTime) {
-                $localValue = $localValue->format('Y-m-d H:i:s');
-            }
-
-            if ($remoteValue instanceof \DateTime) {
-                $remoteValue = $remoteValue->format('Y-m-d H:i:s');
-            }
-
-            $changes[$name] = ['local' => $localValue, 'remote' => $remoteValue];
-        }
-
-        return $changes;
     }
 }
