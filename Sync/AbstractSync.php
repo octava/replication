@@ -6,6 +6,10 @@ use Octava\Component\Replication\Batch\BatchReport;
 use Octava\Component\Replication\Batch\BatchSaver;
 use Symfony\Bridge\Monolog\Logger;
 
+/**
+ * Class AbstractSync
+ * @package Octava\Component\Replication\Sync
+ */
 abstract class AbstractSync
 {
     /**
@@ -43,6 +47,11 @@ abstract class AbstractSync
      */
     protected $availableAliases = [];
 
+    /**
+     * AbstractSync constructor.
+     * @param BatchSaver $batchSaver
+     * @param int        $limit
+     */
     public function __construct(BatchSaver $batchSaver, $limit = 500)
     {
         $this->setBatchSaver($batchSaver);
@@ -66,6 +75,7 @@ abstract class AbstractSync
     public function setLimit($limit)
     {
         $this->limit = $limit;
+
         return $this;
     }
 
@@ -84,9 +94,14 @@ abstract class AbstractSync
     public function setBatchReport($batchReport)
     {
         $this->batchReport = $batchReport;
+
         return $this;
     }
 
+    /**
+     * @param array $rows
+     * @return mixed
+     */
     abstract public function sync(array $rows);
 
     /**
@@ -104,6 +119,7 @@ abstract class AbstractSync
     public function setBatchSaver($batchSaver)
     {
         $this->batchSaver = $batchSaver;
+
         return $this;
     }
 
@@ -122,9 +138,13 @@ abstract class AbstractSync
     public function setFilter($filter)
     {
         $this->filter = $filter;
+
         return $this;
     }
 
+    /**
+     * @param AbstractFilter $filter
+     */
     public function run(AbstractFilter $filter)
     {
         $this->setFilter($filter);
@@ -144,6 +164,7 @@ abstract class AbstractSync
             $this->logger = new Logger(__CLASS__);
             $this->logger->pushHandler(new NullHandler());
         }
+
         return $this->logger;
     }
 
@@ -154,12 +175,18 @@ abstract class AbstractSync
     public function setLogger($logger)
     {
         $this->logger = $logger;
+
         return $this;
     }
 
+    /**
+     * @param AbstractDataProvider $dataProvider
+     * @return $this
+     */
     public function addDataProvider(AbstractDataProvider $dataProvider)
     {
         $this->dataProviders[] = $dataProvider;
+
         return $this;
     }
 
@@ -194,9 +221,15 @@ abstract class AbstractSync
     public function setAvailableAliases($availableAliases)
     {
         $this->availableAliases = $availableAliases;
+
         return $this;
     }
 
+    /**
+     * @param mixed $local
+     * @param mixed $remote
+     * @return bool
+     */
     public function isDifferent($local, $remote)
     {
         $flag = false;
@@ -212,9 +245,14 @@ abstract class AbstractSync
         } elseif ($local != $remote) {
             $flag = true;
         }
+
         return $flag;
     }
 
+    /**
+     * @param callable $callback
+     * @param int      $limit
+     */
     protected function walk(callable $callback, $limit = 500)
     {
         $this->getLogger()->info(sprintf('Initialized %d data provider(s)', count($this->getDataProviders())));
@@ -255,6 +293,7 @@ abstract class AbstractSync
         }
         $result = array_shift($dataProviders);
         $result->setLogger($this->getLogger());
+
         return $result;
     }
 
@@ -286,6 +325,7 @@ abstract class AbstractSync
                 );
             }
         }
+
         return $result;
     }
 
@@ -317,6 +357,7 @@ abstract class AbstractSync
                 }
             }
         }
+
         return $result;
     }
 }
