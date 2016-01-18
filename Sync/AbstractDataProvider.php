@@ -3,6 +3,10 @@ namespace Octava\Component\Replication\Sync;
 
 use Psr\Log\LoggerInterface;
 
+/**
+ * Class AbstractDataProvider
+ * @package Octava\Component\Replication\Sync
+ */
 abstract class AbstractDataProvider
 {
     /**
@@ -16,9 +20,9 @@ abstract class AbstractDataProvider
 
     /**
      * @param AbstractFilter $filter
-     * @param $offset
-     * @param $limit
-     * @return mixed
+     * @param int            $offset
+     * @param int            $limit
+     * @return array
      */
     abstract public function fetch(AbstractFilter $filter, $offset, $limit);
 
@@ -37,6 +41,7 @@ abstract class AbstractDataProvider
     public function setContinueFetch($continueFetch)
     {
         $this->continueFetch = $continueFetch;
+
         return $this;
     }
 
@@ -55,6 +60,7 @@ abstract class AbstractDataProvider
     public function setLogger($logger)
     {
         $this->logger = $logger;
+
         return $this;
     }
 }
