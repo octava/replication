@@ -19,7 +19,7 @@
         }
     },
     "require": {
-        "symfony/monolog-bridge": "^3.0",
+        "symfony/monolog-bridge": "^2.8|^3.0",
         "doctrine/orm": "^2.5"
     }
 }
