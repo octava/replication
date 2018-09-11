@@ -1,5 +1,5 @@
 {
-    "name": "octava/replication",
+    "name": "dqe/replication",
     "description": "Replication component for mysql",
     "type": "library",
     "license": "MIT",
