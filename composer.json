@@ -1,5 +1,5 @@
 {
-    "name": "octava/replication",
+    "name": "dqe/replication",
     "description": "Replication component for mysql",
     "type": "library",
     "license": "MIT",
@@ -15,11 +15,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0.x-dev"
+            "dev-master": "4.0.x-dev"
         }
     },
     "require": {
-        "symfony/monolog-bridge": "^2.8.1|^3.0.0",
+        "symfony/monolog-bridge": "^2.8.1|^3.0.0|^4.0.0",
         "doctrine/orm": "^2.5.0"
     }
 }

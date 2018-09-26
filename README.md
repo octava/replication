@@ -7,5 +7,5 @@ Help for replicate data to mysql db.
 ## Installation
 
 ```
-composer require octava/replication
+composer require dqe/replication
 ```
